@@ -1,0 +1,24 @@
+server:
+  port: 8080
+
+database:
+  host: localhost
+  port: 3306
+  user: root
+  password: password
+  name: coffee_shop
+
+redis:
+  host: localhost
+  port: 6379
+  password: ""
+
+kafka:
+  brokers:
+    - "localhost:9092"
+  topics:
+    orders: "orders-topic"
+    inventory: "inventory-topic"
+    payments: "payments-topic"
+  consumerGroup: "coffee-shop-consumer"
+  bootstrap_servers: "localhost:9092"
