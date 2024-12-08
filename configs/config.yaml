@@ -17,11 +17,13 @@ kafka:
   brokers:
     - "localhost:9092"
   topics:
-    orders: "orders-topic"
-    inventory: "inventory-topic"
-    payments: "payments-topic"
+    orders: "orders"
+    inventory: "inventory"
+    payments: "payments"
+    emailConfirmation: "email_confirmation"
   consumerGroup: "coffee-shop-consumer"
   bootstrap_servers: "localhost:9092"
+  
 
 jwt:
   secret_key: "your_secret_key_here"

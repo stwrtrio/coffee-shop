@@ -17,7 +17,9 @@ type KafkaClient struct {
 // InitKafka initializes Kafka producer and consumer.
 func InitKafka(config *utils.KafkaConfig) (*KafkaClient, error) {
 	// Initialize producer
-	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": strings.Join(config.Brokers, ",")})
+	producer, err := kafka.NewProducer(&kafka.ConfigMap{
+		"bootstrap.servers": strings.Join(config.Brokers, ","),
+	})
 	if err != nil {
 		log.Fatalf("Error creating Kafka producer: %v", err)
 		return nil, err
@@ -26,7 +28,7 @@ func InitKafka(config *utils.KafkaConfig) (*KafkaClient, error) {
 	// Initialize consumer
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers": strings.Join(config.Brokers, ","),
-		"group.id":          "coffee-shop-consumer-group",
+		"group.id":          config.ConsumerGroup,
 		"auto.offset.reset": "earliest",
 	})
 	if err != nil {
@@ -35,6 +37,36 @@ func InitKafka(config *utils.KafkaConfig) (*KafkaClient, error) {
 	}
 
 	return &KafkaClient{Producer: producer, Consumer: consumer}, nil
+}
+
+// Produce sends a message to a Kafka topic.
+func (k *KafkaClient) Produce(topic string, message []byte) error {
+	return k.Producer.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+		Value:          message,
+	}, nil)
+}
+
+// Consume listens for messages on a Kafka topic and processes them using the provided handler.
+func (k *KafkaClient) Consume(topic string, handler func(message *kafka.Message) error) {
+	// Subscribe to the topic
+	err := k.Consumer.SubscribeTopics([]string{topic}, nil)
+	if err != nil {
+		log.Fatalf("Error subscribing to topic: %v", err)
+	}
+
+	for {
+		msg, err := k.Consumer.ReadMessage(-1) // -1: Wait indefinitely
+		if err != nil {
+			log.Printf("Consumer error: %v", err)
+			continue
+		}
+
+		// Handle the message
+		if err := handler(msg); err != nil {
+			log.Printf("Error processing message: %v", err)
+		}
+	}
 }
 
 // Close closes the Kafka producer and consumer.

@@ -52,7 +52,7 @@ func main() {
 	userRepo := repositories.NewUserRepository(db)
 
 	// Services
-	userService := services.NewUserService(userRepo)
+	userService := services.NewUserService(userRepo, config, kafkaClient)
 
 	// Handler
 	userHandler := handlers.NewUserHandler(userService)

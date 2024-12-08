@@ -36,11 +36,13 @@ func (h *UserHandler) RegisterUser(c echo.Context) error {
 
 	// Create user
 	user := &models.User{
-		ID:           uuid.NewString(),
-		FirstName:    req.FirstName,
-		LastName:     req.LastName,
-		Email:        req.Email,
-		PasswordHash: string(hashedPassword),
+		ID:                    uuid.NewString(),
+		FirstName:             req.FirstName,
+		LastName:              req.LastName,
+		Email:                 req.Email,
+		PasswordHash:          string(hashedPassword),
+		EmailConfirmationCode: utils.GenerateConfirmationCode(),
+		IsEmailConfirmed:      false,
 	}
 
 	if err := h.UserService.RegisterUser(ctx, user); err != nil {

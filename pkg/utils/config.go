@@ -25,8 +25,14 @@ type DatabaseConfig struct {
 
 // KafkaConfig holds Kafka connection details.
 type KafkaConfig struct {
-	Brokers []string `yaml:"brokers"`
-	Topic   string   `yaml:"topic"`
+	Brokers       []string `yaml:"brokers"`
+	ConsumerGroup string   `yaml:"consumerGroup"`
+	Topics        struct {
+		Orders            string `yaml:"orders"`
+		Inventory         string `yaml:"inventory"`
+		Payments          string `yaml:"payments"`
+		EmailConfirmation string `yaml:"emailConfirmation"`
+	} `yaml:"topics"`
 }
 
 // RedisConfig holds Redis connection details.
