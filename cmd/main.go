@@ -4,10 +4,18 @@ import (
 	"context"
 	"log"
 
+	"github.com/stwrtrio/coffee-shop/internal/delivery/http/handlers"
+	"github.com/stwrtrio/coffee-shop/internal/domain/repositories"
+	"github.com/stwrtrio/coffee-shop/internal/domain/services"
+	"github.com/stwrtrio/coffee-shop/internal/routes"
 	"github.com/stwrtrio/coffee-shop/pkg/database"
 	"github.com/stwrtrio/coffee-shop/pkg/kafka"
+	"github.com/stwrtrio/coffee-shop/pkg/middlewares"
 	"github.com/stwrtrio/coffee-shop/pkg/redis"
 	"github.com/stwrtrio/coffee-shop/pkg/utils"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
@@ -39,6 +47,25 @@ func main() {
 	}
 	log.Println("Connected to Redis")
 	defer redisClient.Close()
+
+	// Repository
+	userRepo := repositories.NewUserRepository(db)
+
+	// Services
+	userService := services.NewUserService(userRepo)
+
+	// Handler
+	userHandler := handlers.NewUserHandler(userService)
+
+	// Set up Echo
+	e := echo.New()
+	e.Validator = &middlewares.CustomValidator{Validator: validator.New()}
+
+	// User Routes
+	routes.RegisterAuthRoutes(e, userHandler)
+
+	// Start the server
+	e.Logger.Fatal(e.Start(":8080"))
 
 	// Setup graceful shutdown logic
 	ctx, cancel := context.WithCancel(context.Background())

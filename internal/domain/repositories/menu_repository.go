@@ -8,6 +8,9 @@ type menuRepository struct {
 	db *gorm.DB
 }
 
-func NewMenuRepository(db *gorm.DB) MenuRepositoryImpl {
+type MenuRepository interface {
+}
+
+func NewMenuRepository(db *gorm.DB) MenuRepository {
 	return &menuRepository{db: db}
 }

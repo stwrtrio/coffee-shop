@@ -6,7 +6,7 @@ database:
   port: 3306
   user: root
   password: password
-  name: coffee_shop
+  dbname: coffee_shop
 
 redis:
   host: localhost
@@ -22,3 +22,6 @@ kafka:
     payments: "payments-topic"
   consumerGroup: "coffee-shop-consumer"
   bootstrap_servers: "localhost:9092"
+
+jwt:
+  secret_key: "your_secret_key_here"

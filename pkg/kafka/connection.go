@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"log"
+	"strings"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/stwrtrio/coffee-shop/pkg/utils"
@@ -16,7 +17,7 @@ type KafkaClient struct {
 // InitKafka initializes Kafka producer and consumer.
 func InitKafka(config *utils.KafkaConfig) (*KafkaClient, error) {
 	// Initialize producer
-	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": config.Brokers[0]})
+	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": strings.Join(config.Brokers, ",")})
 	if err != nil {
 		log.Fatalf("Error creating Kafka producer: %v", err)
 		return nil, err
@@ -24,7 +25,7 @@ func InitKafka(config *utils.KafkaConfig) (*KafkaClient, error) {
 
 	// Initialize consumer
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": config.Brokers[0],
+		"bootstrap.servers": strings.Join(config.Brokers, ","),
 		"group.id":          "coffee-shop-consumer-group",
 		"auto.offset.reset": "earliest",
 	})

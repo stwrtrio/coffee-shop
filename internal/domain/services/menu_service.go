@@ -5,9 +5,9 @@ import (
 )
 
 type MenuService struct {
-	MenuRepo repositories.MenuRepositoryImpl
+	MenuRepo repositories.MenuRepository
 }
 
-func NewMenuService(repo repositories.MenuRepositoryImpl) *MenuService {
+func NewMenuService(repo repositories.MenuRepository) *MenuService {
 	return &MenuService{MenuRepo: repo}
 }
