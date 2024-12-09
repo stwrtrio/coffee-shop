@@ -51,3 +51,22 @@ func (h *CustomerHandler) RegisterCustomer(c echo.Context) error {
 
 	return utils.SuccessResponse(c, http.StatusCreated, "customer registered successfully", nil)
 }
+
+// Login handles user login
+func (h *CustomerHandler) LoginCustomer(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	// Parse request body
+	var customerRequest models.LoginRequest
+	if err := c.Bind(&customerRequest); err != nil {
+		return utils.FailResponse(c, http.StatusBadRequest, "Invalid request body")
+	}
+
+	// Call the service to validate credentials and generate token
+	token, err := h.CustomerService.LoginCustomer(ctx, &customerRequest)
+	if err != nil {
+		return utils.FailResponse(c, http.StatusUnauthorized, "invalid credentials")
+	}
+
+	return utils.SuccessResponse(c, http.StatusOK, "Access granted", map[string]string{"token": token})
+}

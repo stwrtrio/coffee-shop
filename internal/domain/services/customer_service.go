@@ -4,17 +4,21 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/stwrtrio/coffee-shop/internal/domain/repositories"
 	"github.com/stwrtrio/coffee-shop/models"
 	"github.com/stwrtrio/coffee-shop/pkg/constants"
+	"github.com/stwrtrio/coffee-shop/pkg/jwt"
 	"github.com/stwrtrio/coffee-shop/pkg/kafka"
 	"github.com/stwrtrio/coffee-shop/pkg/utils"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type CustomerService interface {
 	RegisterCustomer(ctx context.Context, input *models.Customer) error
+	LoginCustomer(ctx context.Context, customer *models.LoginRequest) (string, error)
 }
 
 type customerService struct {
@@ -58,4 +62,27 @@ func (s *customerService) RegisterCustomer(ctx context.Context, input *models.Cu
 	}
 
 	return nil
+}
+
+// Login checks if the user credentials are correct and generates a JWT token
+func (s *customerService) LoginCustomer(ctx context.Context, customer *models.LoginRequest) (string, error) {
+	// Fetch customer from repository
+	customerResult, err := s.customerRepo.FindCustomerByEmail(ctx, customer.Email)
+	if err != nil {
+		return "", errors.New("user not found")
+	}
+
+	// Check if the password matches
+	err = bcrypt.CompareHashAndPassword([]byte(customerResult.PasswordHash), []byte(customer.Password))
+	if err != nil {
+		return "", errors.New("invalid password")
+	}
+
+	// Generate JWT token
+	token, err := jwt.GenerateJWTToken(s.config, customerResult.ID, customerResult.Email)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate token: %v", err)
+	}
+
+	return token, nil
 }

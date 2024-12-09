@@ -9,4 +9,5 @@ import (
 func RegisterAuthRoutes(e *echo.Echo, customerHandler *handlers.CustomerHandler) {
 	// Public routes
 	e.POST("/api/customer/register", customerHandler.RegisterCustomer)
+	e.POST("/api/customer/login", customerHandler.LoginCustomer)
 }

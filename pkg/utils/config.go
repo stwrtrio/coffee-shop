@@ -3,6 +3,7 @@ package utils
 import (
 	"log"
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -13,6 +14,12 @@ type Config struct {
 	Kafka    KafkaConfig    `yaml:"kafka"`
 	Redis    RedisConfig    `yaml:"redis"`
 	Email    EmailConfig    `yaml:"email"`
+	Jwt      JwtConfig      `yaml:"jwt"`
+}
+
+type JwtConfig struct {
+	SecretKey string        `yaml:"secret_key"`
+	Expiry    time.Duration `yaml:"expiry"`
 }
 
 type EmailConfig struct {
