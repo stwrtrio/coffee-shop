@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS coffee_shop.orders (
     id VARCHAR(36) PRIMARY KEY,
-    user_id VARCHAR(36) REFERENCES users(id) ON DELETE CASCADE,
+    customer_id VARCHAR(36) REFERENCES customers(id) ON DELETE CASCADE,
     total_price DECIMAL(10, 2) NOT NULL,
     status VARCHAR(50) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT current_timestamp(),

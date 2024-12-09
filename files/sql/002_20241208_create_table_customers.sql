@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS coffee_shop.users (
+CREATE TABLE IF NOT EXISTS coffee_shop.customers (
     id VARCHAR(36) PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,

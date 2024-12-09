@@ -4,13 +4,13 @@ import "time"
 
 type Order struct {
 	ID         string  `gorm:"type:uuid;primaryKey"`
-	UserID     string  `gorm:"type:uuid;not null"`
+	CustomerID string  `gorm:"type:uuid;not null"`
 	TotalPrice float64 `gorm:"not null"`
 	Status     string  `gorm:"default:'Pending'"`
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 
-	User User `gorm:"foreignKey:UserID"`
+	Customer Customer `gorm:"foreignKey:CustomerID"`
 }
 
 type OrderItem struct {

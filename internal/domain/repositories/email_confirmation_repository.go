@@ -7,7 +7,7 @@ import (
 )
 
 type EmailConfirmationRepository interface {
-	CreateEmailConfirmation(user *models.Notification) error
+	CreateEmailConfirmation(customer *models.Notification) error
 }
 
 type emailConfirmationRepository struct {
@@ -18,6 +18,6 @@ func NewEmailConfirmationRepository(db *gorm.DB) EmailConfirmationRepository {
 	return &emailConfirmationRepository{db: db}
 }
 
-func (r *emailConfirmationRepository) CreateEmailConfirmation(user *models.Notification) error {
-	return r.db.Create(user).Error
+func (r *emailConfirmationRepository) CreateEmailConfirmation(customer *models.Notification) error {
+	return r.db.Create(customer).Error
 }

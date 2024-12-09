@@ -6,7 +6,7 @@ import (
 )
 
 // RegisterAuthRoutes sets up routes for authentication-related endpoints.
-func RegisterAuthRoutes(e *echo.Echo, userHandler *handlers.UserHandler) {
+func RegisterAuthRoutes(e *echo.Echo, customerHandler *handlers.CustomerHandler) {
 	// Public routes
-	e.POST("/api/user/register", userHandler.RegisterUser)
+	e.POST("/api/customer/register", customerHandler.RegisterCustomer)
 }

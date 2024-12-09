@@ -51,12 +51,12 @@ func main() {
 	defer redisClient.Close()
 
 	// Repository
-	userRepo := repositories.NewUserRepository(db)
+	customerRepo := repositories.NewCustomerRepository(db)
 	emailConfirmationRepo := repositories.NewEmailConfirmationRepository(db)
 	notificationRepo := repositories.NewNotificationRepository(db)
 
 	// Services
-	userService := services.NewUserService(config, userRepo, kafkaClient)
+	customerService := services.NewCustomerService(config, customerRepo, kafkaClient)
 	emailConfirmationService := services.NewEmailConfirmationRepository(config, kafkaClient, emailConfirmationRepo)
 
 	// Start Kafka Consumer
@@ -75,14 +75,14 @@ func main() {
 	go notificationScheduler.StartScheduler()
 
 	// Handler
-	userHandler := handlers.NewUserHandler(userService)
+	customerHandler := handlers.NewCustomerHandler(customerService)
 
 	// Set up Echo
 	e := echo.New()
 	e.Validator = &middlewares.CustomValidator{Validator: validator.New()}
 
-	// User Routes
-	routes.RegisterAuthRoutes(e, userHandler)
+	// Customer Routes
+	routes.RegisterAuthRoutes(e, customerHandler)
 
 	// Start the server
 	e.Logger.Fatal(e.Start(":8080"))

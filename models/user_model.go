@@ -2,7 +2,7 @@ package models
 
 import "time"
 
-type User struct {
+type Customer struct {
 	ID                    string `gorm:"type:uuid;primaryKey"`
 	FirstName             string `gorm:"size:255;not null"`
 	LastName              string `gorm:"size:255;not null"`

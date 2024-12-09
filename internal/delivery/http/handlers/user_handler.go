@@ -12,16 +12,16 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserHandler struct {
-	UserService services.UserService
+type CustomerHandler struct {
+	CustomerService services.CustomerService
 }
 
-func NewUserHandler(service services.UserService) *UserHandler {
-	return &UserHandler{service}
+func NewCustomerHandler(service services.CustomerService) *CustomerHandler {
+	return &CustomerHandler{service}
 }
 
-// Register a new user
-func (h *UserHandler) RegisterUser(c echo.Context) error {
+// Register a new customer
+func (h *CustomerHandler) RegisterCustomer(c echo.Context) error {
 	ctx := c.Request().Context()
 	var req models.RegisterRequest
 	if err := c.Bind(&req); err != nil {
@@ -34,8 +34,8 @@ func (h *UserHandler) RegisterUser(c echo.Context) error {
 		return utils.FailResponse(c, http.StatusInternalServerError, "Failed to hash password")
 	}
 
-	// Create user
-	user := &models.User{
+	// Create customer
+	customer := &models.Customer{
 		ID:                    uuid.NewString(),
 		FirstName:             req.FirstName,
 		LastName:              req.LastName,
@@ -45,9 +45,9 @@ func (h *UserHandler) RegisterUser(c echo.Context) error {
 		IsEmailConfirmed:      false,
 	}
 
-	if err := h.UserService.RegisterUser(ctx, user); err != nil {
-		return utils.FailResponse(c, http.StatusInternalServerError, "Failed to create user")
+	if err := h.CustomerService.RegisterCustomer(ctx, customer); err != nil {
+		return utils.FailResponse(c, http.StatusInternalServerError, "Failed to create customer")
 	}
 
-	return utils.SuccessResponse(c, http.StatusCreated, "user registered successfully", nil)
+	return utils.SuccessResponse(c, http.StatusCreated, "customer registered successfully", nil)
 }

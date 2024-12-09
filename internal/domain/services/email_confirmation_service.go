@@ -56,14 +56,14 @@ func (s *emailConfirmationService) ConsumeEmailConfirmation() error {
 
 		// Insert into notification table
 		notification := models.Notification{
-			ID:        uuid.New().String(),
-			UserID:    emailMsg.UserID,
-			Email:     emailMsg.Email,
-			Code:      emailMsg.Code,
-			Type:      emailMsg.Type,
-			Status:    "pending",
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
+			ID:         uuid.New().String(),
+			CustomerID: emailMsg.CustomerID,
+			Email:      emailMsg.Email,
+			Code:       emailMsg.Code,
+			Type:       emailMsg.Type,
+			Status:     "pending",
+			CreatedAt:  time.Now(),
+			UpdatedAt:  time.Now(),
 		}
 
 		// Insert notification into the database
