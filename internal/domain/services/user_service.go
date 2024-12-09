@@ -17,13 +17,13 @@ type UserService interface {
 }
 
 type userService struct {
+	config   *utils.Config
 	userRepo repositories.UserRepository
 	kafka    *kafka.KafkaClient
-	config   *utils.Config
 }
 
-func NewUserService(userRepo repositories.UserRepository, config *utils.Config, kafka *kafka.KafkaClient) UserService {
-	return &userService{userRepo: userRepo, config: config, kafka: kafka}
+func NewUserService(config *utils.Config, userRepo repositories.UserRepository, kafka *kafka.KafkaClient) UserService {
+	return &userService{config: config, userRepo: userRepo, kafka: kafka}
 }
 
 func (s *userService) RegisterUser(ctx context.Context, input *models.User) error {

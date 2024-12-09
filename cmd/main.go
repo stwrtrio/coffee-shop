@@ -50,9 +50,14 @@ func main() {
 
 	// Repository
 	userRepo := repositories.NewUserRepository(db)
+	emailConfirmationRepo := repositories.NewEmailConfirmationRepository(db)
 
 	// Services
-	userService := services.NewUserService(userRepo, config, kafkaClient)
+	userService := services.NewUserService(config, userRepo, kafkaClient)
+	emailConfirmationService := services.NewEmailConfirmationRepository(config, kafkaClient, emailConfirmationRepo)
+
+	// Start Kafka Consumer
+	go emailConfirmationService.ConsumeEmailConfirmation()
 
 	// Handler
 	userHandler := handlers.NewUserHandler(userService)
