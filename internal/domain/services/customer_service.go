@@ -6,7 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/stwrtrio/coffee-shop/internal/domain/repositories"
 	"github.com/stwrtrio/coffee-shop/models"
 	"github.com/stwrtrio/coffee-shop/pkg/constants"
@@ -17,8 +19,9 @@ import (
 )
 
 type CustomerService interface {
-	RegisterCustomer(ctx context.Context, input *models.Customer) error
+	RegisterCustomer(ctx context.Context, input *models.RegisterRequest) error
 	LoginCustomer(ctx context.Context, customer *models.LoginRequest) (string, error)
+	ConfirmCode(ctx context.Context, email, code string) error
 }
 
 type customerService struct {
@@ -31,9 +34,9 @@ func NewCustomerService(config *utils.Config, customerRepo repositories.Customer
 	return &customerService{config: config, customerRepo: customerRepo, kafka: kafka}
 }
 
-func (s *customerService) RegisterCustomer(ctx context.Context, input *models.Customer) error {
+func (s *customerService) RegisterCustomer(ctx context.Context, req *models.RegisterRequest) error {
 	// Check if the email is already in use
-	existingCustomer, err := s.customerRepo.FindCustomerByEmail(ctx, input.Email)
+	existingCustomer, err := s.customerRepo.FindCustomerByEmail(ctx, req.Email)
 	if err != nil {
 		return err
 	}
@@ -41,16 +44,34 @@ func (s *customerService) RegisterCustomer(ctx context.Context, input *models.Cu
 		return errors.New("email already in use")
 	}
 
+	// Hash the password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return errors.New("failed to hash password")
+	}
+
+	// Create customer
+	customer := &models.Customer{
+		ID:                      uuid.NewString(),
+		FirstName:               req.FirstName,
+		LastName:                req.LastName,
+		Email:                   req.Email,
+		PasswordHash:            string(hashedPassword),
+		EmailConfirmationCode:   utils.GenerateConfirmationCode(),
+		EmailConfirmationExpiry: time.Now().Add(15 * time.Minute),
+		IsEmailConfirmed:        false,
+	}
+
 	// Save the customer to the database
-	if err = s.customerRepo.CreateCustomer(input); err != nil {
+	if err = s.customerRepo.CreateCustomer(customer); err != nil {
 		return err
 	}
 
 	// Publish to Kafka
 	message := map[string]string{
-		"customer_id": input.ID,
-		"email":       input.Email,
-		"code":        input.EmailConfirmationCode,
+		"customer_id": customer.ID,
+		"email":       customer.Email,
+		"code":        customer.EmailConfirmationCode,
 		"type":        string(constants.EmailTypeConfirmation),
 	}
 	messageBytes, _ := json.Marshal(message)
@@ -64,12 +85,16 @@ func (s *customerService) RegisterCustomer(ctx context.Context, input *models.Cu
 	return nil
 }
 
-// Login checks if the user credentials are correct and generates a JWT token
+// Login checks if the customer credentials are correct and generates a JWT token
 func (s *customerService) LoginCustomer(ctx context.Context, customer *models.LoginRequest) (string, error) {
 	// Fetch customer from repository
 	customerResult, err := s.customerRepo.FindCustomerByEmail(ctx, customer.Email)
 	if err != nil {
-		return "", errors.New("user not found")
+		return "", fmt.Errorf("customer not found")
+	}
+
+	if !customerResult.IsEmailConfirmed {
+		return "", fmt.Errorf("customer is not confirmed")
 	}
 
 	// Check if the password matches
@@ -85,4 +110,34 @@ func (s *customerService) LoginCustomer(ctx context.Context, customer *models.Lo
 	}
 
 	return token, nil
+}
+
+func (s *customerService) ConfirmCode(ctx context.Context, email, code string) error {
+	// Fetch the customer by email
+	customer, err := s.customerRepo.FindCustomerByEmail(ctx, email)
+	if err != nil {
+		return err
+	}
+
+	// Check if the code matches and is not expired
+	if customer.EmailConfirmationCode != code {
+		return errors.New("invalid confirmation code")
+	}
+
+	// Check if the code is expired
+	if time.Now().After(customer.EmailConfirmationExpiry) {
+		return errors.New("confirmation code expired")
+	}
+
+	// Mark the email as confirmed
+	customer.IsEmailConfirmed = true
+	customer.EmailConfirmationCode = "" // Clear the confirmation code
+
+	// Save the updated customer data
+	err = s.customerRepo.Update(customer)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

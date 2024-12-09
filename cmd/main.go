@@ -82,7 +82,7 @@ func main() {
 	e.Validator = &middlewares.CustomValidator{Validator: validator.New()}
 
 	// Customer Routes
-	routes.RegisterAuthRoutes(e, customerHandler)
+	routes.CustomerRoutes(e, customerHandler)
 
 	// Start the server
 	e.Logger.Fatal(e.Start(":8080"))

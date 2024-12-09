@@ -10,6 +10,7 @@ import (
 type CustomerRepository interface {
 	CreateCustomer(customer *models.Customer) error
 	FindCustomerByEmail(ctx context.Context, email string) (*models.Customer, error)
+	Update(user *models.Customer) error
 }
 
 type customerRepository struct {
@@ -31,4 +32,8 @@ func (r *customerRepository) FindCustomerByEmail(ctx context.Context, email stri
 		return nil, nil
 	}
 	return &customer, err
+}
+
+func (r *customerRepository) Update(user *models.Customer) error {
+	return r.db.Save(user).Error
 }
