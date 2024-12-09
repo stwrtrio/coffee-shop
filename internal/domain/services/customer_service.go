@@ -8,6 +8,7 @@ import (
 
 	"github.com/stwrtrio/coffee-shop/internal/domain/repositories"
 	"github.com/stwrtrio/coffee-shop/models"
+	"github.com/stwrtrio/coffee-shop/pkg/constants"
 	"github.com/stwrtrio/coffee-shop/pkg/kafka"
 	"github.com/stwrtrio/coffee-shop/pkg/utils"
 )
@@ -46,7 +47,7 @@ func (s *customerService) RegisterCustomer(ctx context.Context, input *models.Cu
 		"customer_id": input.ID,
 		"email":       input.Email,
 		"code":        input.EmailConfirmationCode,
-		"type":        "email_confirmation",
+		"type":        string(constants.EmailTypeConfirmation),
 	}
 	messageBytes, _ := json.Marshal(message)
 

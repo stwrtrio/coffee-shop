@@ -69,15 +69,11 @@ func (s *NotificationScheduler) StartScheduler() {
 
 func (s *NotificationScheduler) processNotifications(notificationChan <-chan models.Notification, doneChan chan<- bool) {
 	for notification := range notificationChan {
-
-		var subject, body string
-		if notification.Type == constants.NotificationConstants["email"]["type"] {
-			subject = constants.NotificationConstants["email"]["subject"]
-			body = fmt.Sprintf("%s: %s\n", constants.NotificationConstants["email"]["body"], notification.Code)
-		}
+		subject := constants.NotificationConstants.EmailSubject[string(constants.EmailTypeConfirmation)]
+		body := constants.NotificationConstants.EmailBody[string(constants.EmailTypeConfirmation)]
 
 		// Simulate sending email
-		err := s.EmailService.SendEmail(subject, notification.Email, body)
+		err := s.EmailService.SendEmail(subject, notification.Email, fmt.Sprintf(body, notification.Code))
 		if err != nil {
 			log.Printf("Error sending email to %s: %v", notification.Email, err)
 			continue
