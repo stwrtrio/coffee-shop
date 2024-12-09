@@ -12,6 +12,14 @@ type Config struct {
 	Database DatabaseConfig `yaml:"database"`
 	Kafka    KafkaConfig    `yaml:"kafka"`
 	Redis    RedisConfig    `yaml:"redis"`
+	Email    EmailConfig    `yaml:"email"`
+}
+
+type EmailConfig struct {
+	SMTPHost     string `yaml:"smtpHost"`
+	SMTPPort     string `yaml:"smtpPort"`
+	SenderEmail  string `yaml:"senderEmail"`
+	SenderPasswd string `yaml:"senderPasswd"`
 }
 
 // DatabaseConfig holds the database connection details.

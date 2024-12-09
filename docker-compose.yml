@@ -9,6 +9,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     container_name: coffee-shop-app
     ports:
       - "8080:8080"
@@ -61,3 +63,10 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "1025:1025" # SMTP server
+      - "8025:8025" # Web UI

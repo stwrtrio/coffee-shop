@@ -23,7 +23,12 @@ kafka:
     emailConfirmation: "email_confirmation"
   consumerGroup: "coffee-shop-consumer"
   bootstrap_servers: "localhost:9092"
-  
+
+email:
+  smtpHost: "localhost"
+  smtpPort: "1025"
+  senderEmail: "youremail@gmail.com"
+  senderPasswd: "your-email-password"
 
 jwt:
   secret_key: "your_secret_key_here"

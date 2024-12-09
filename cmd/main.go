@@ -9,10 +9,12 @@ import (
 	"github.com/stwrtrio/coffee-shop/internal/domain/services"
 	"github.com/stwrtrio/coffee-shop/internal/routes"
 	"github.com/stwrtrio/coffee-shop/pkg/database"
+	"github.com/stwrtrio/coffee-shop/pkg/email"
 	"github.com/stwrtrio/coffee-shop/pkg/kafka"
 	"github.com/stwrtrio/coffee-shop/pkg/middlewares"
 	"github.com/stwrtrio/coffee-shop/pkg/redis"
 	"github.com/stwrtrio/coffee-shop/pkg/utils"
+	"github.com/stwrtrio/coffee-shop/scheduler"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
@@ -51,6 +53,7 @@ func main() {
 	// Repository
 	userRepo := repositories.NewUserRepository(db)
 	emailConfirmationRepo := repositories.NewEmailConfirmationRepository(db)
+	notificationRepo := repositories.NewNotificationRepository(db)
 
 	// Services
 	userService := services.NewUserService(config, userRepo, kafkaClient)
@@ -58,6 +61,18 @@ func main() {
 
 	// Start Kafka Consumer
 	go emailConfirmationService.ConsumeEmailConfirmation()
+
+	// Initialize email service
+	emailService := email.NewEmailService(
+		config.Email.SMTPHost,
+		config.Email.SMTPPort,
+		config.Email.SenderEmail,
+		config.Email.SenderPasswd,
+	)
+
+	// Start the notification scheduler
+	notificationScheduler := scheduler.NewNotificationScheduler(notificationRepo, emailService)
+	go notificationScheduler.StartScheduler()
 
 	// Handler
 	userHandler := handlers.NewUserHandler(userService)
