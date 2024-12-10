@@ -19,3 +19,17 @@ type Menu struct {
 	UpdatedAt       time.Time `gorm:"autoUpdateTime" json:"updated_at"`
 	IsDeleted       bool      `gorm:"default:false" json:"is_deleted"`
 }
+
+type MenuRequest struct {
+	Name            string  `json:"name" validate:"required"`
+	Description     string  `json:"description"`
+	Price           float64 `json:"price"`
+	CategoryID      string  `json:"category_id" validate:"required"`
+	Availability    bool    `json:"availability"`
+	ImageURL        string  `json:"image_url"`
+	Ingredients     string  `json:"ingredients"`
+	PreparationTime int     `json:"preparation_time"`
+	Calories        int     `json:"calories"`
+
+	CreatedBy string
+}

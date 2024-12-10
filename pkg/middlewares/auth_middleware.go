@@ -9,6 +9,11 @@ import (
 	"github.com/stwrtrio/coffee-shop/pkg/utils"
 )
 
+func GetUserFromContext(c echo.Context) (*helpers.Claims, bool) {
+	claims, ok := c.Get("user").(*helpers.Claims)
+	return claims, ok
+}
+
 func JWTMiddleware(config utils.JwtConfig) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {

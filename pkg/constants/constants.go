@@ -3,8 +3,17 @@ package constants
 type EmailType string
 
 const (
+	// Handler Error Message
+	ErrInvalidRequestBody = "Invalid request body"
+	ErrInvalidToken       = "Invalid Token"
+
+	// Email Error Message
 	EmailTypeConfirmation  EmailType = "confirmation"
 	EmailTypePasswordReset EmailType = "password_reset"
+
+	// Menu Error Message
+	ErrMenuAlreadyExists = "menu already exist"
+	ErrCategoryNotExists = "category is not exist"
 )
 
 var NotificationConstants = struct {
