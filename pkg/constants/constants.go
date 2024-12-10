@@ -14,6 +14,9 @@ const (
 	// Menu Error Message
 	ErrMenuAlreadyExists = "menu already exist"
 	ErrCategoryNotExists = "category is not exist"
+
+	// Redis Cache Key
+	MenusCacheKey = "menus:page=%d:limit=%d"
 )
 
 var NotificationConstants = struct {

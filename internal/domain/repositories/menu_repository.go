@@ -13,6 +13,7 @@ type menuRepository struct {
 
 type MenuRepository interface {
 	CreateMenu(menu *models.Menu) error
+	GetAllMenus(ctx context.Context, offset, limit int) ([]models.Menu, error)
 	FindMenuByName(ctx context.Context, menuName string) (*models.Menu, error)
 }
 
@@ -22,6 +23,12 @@ func NewMenuRepository(db *gorm.DB) MenuRepository {
 
 func (r *menuRepository) CreateMenu(menu *models.Menu) error {
 	return r.db.Create(menu).Error
+}
+
+func (r *menuRepository) GetAllMenus(ctx context.Context, offset, limit int) ([]models.Menu, error) {
+	var menus []models.Menu
+	err := r.db.WithContext(ctx).Offset(offset).Limit(limit).Where("is_deleted = ?", false).Find(&menus).Error
+	return menus, err
 }
 
 func (r *menuRepository) FindMenuByName(ctx context.Context, menuName string) (*models.Menu, error) {

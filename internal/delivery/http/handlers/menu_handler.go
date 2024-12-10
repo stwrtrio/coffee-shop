@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stwrtrio/coffee-shop/internal/domain/services"
@@ -42,4 +43,24 @@ func (h *MenuHandler) CreateMenu(c echo.Context) error {
 	}
 
 	return utils.SuccessResponse(c, http.StatusCreated, "", menu)
+}
+
+func (h *MenuHandler) GetAllMenus(c echo.Context) error {
+	useCache := c.QueryParam("use-cache")
+	page, err := strconv.Atoi(c.QueryParam("page"))
+	if err != nil || page < 1 {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(c.QueryParam("limit"))
+	if err != nil || limit < 1 {
+		limit = 10
+	}
+
+	menus, err := h.service.GetAllMenus(c.Request().Context(), page, limit, useCache)
+	if err != nil {
+		return utils.FailResponse(c, http.StatusInternalServerError, "Failed to fetch menus")
+	}
+
+	return utils.SuccessResponse(c, http.StatusCreated, "", menus)
 }

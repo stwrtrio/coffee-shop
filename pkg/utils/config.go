@@ -53,9 +53,10 @@ type KafkaConfig struct {
 
 // RedisConfig holds Redis connection details.
 type RedisConfig struct {
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	Password string `yaml:"password"`
+	Host                   string        `yaml:"host"`
+	Port                   int           `yaml:"port"`
+	Password               string        `yaml:"password"`
+	CacheDefaultExpiration time.Duration `yaml:"cacheDefaultExpiration"`
 }
 
 // LoadConfig loads the YAML config file into a Config struct.

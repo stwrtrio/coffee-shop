@@ -12,6 +12,7 @@ redis:
   host: localhost
   port: 6379
   password: ""
+  cacheDefaultExpiration: "3600s"
 
 kafka:
   brokers:

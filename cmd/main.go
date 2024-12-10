@@ -60,7 +60,7 @@ func main() {
 	// Services
 	customerService := services.NewUserService(config, customerRepo, kafkaClient)
 	emailConfirmationService := services.NewEmailConfirmationRepository(config, kafkaClient, emailConfirmationRepo)
-	menuService := services.NewMenuService(menuRepo, categoryRepo)
+	menuService := services.NewMenuService(config, redisClient, menuRepo, categoryRepo)
 	categoryService := services.NewCategoryService(categoryRepo)
 
 	// Start Kafka Consumer
