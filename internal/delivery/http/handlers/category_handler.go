@@ -29,5 +29,15 @@ func (h *CategoryHandler) CreateCategory(c echo.Context) error {
 		return utils.FailResponse(c, http.StatusInternalServerError, "Failed to create category")
 	}
 
-	return utils.SuccessResponse(c, http.StatusCreated, "category create successfully", result)
+	return utils.SuccessResponse(c, http.StatusCreated, "", result)
+}
+
+func (h *CategoryHandler) GetAllCategories(c echo.Context) error {
+	ctx := c.Request().Context()
+	categories, err := h.CategoryService.GetAllCategories(ctx)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to fetch categories")
+	}
+
+	return utils.SuccessResponse(c, http.StatusOK, "", categories)
 }

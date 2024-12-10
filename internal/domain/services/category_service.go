@@ -11,6 +11,7 @@ import (
 
 type CategoryService interface {
 	CreateCategory(ctx context.Context, req *models.CategoryRequest) (*models.Categories, error)
+	GetAllCategories(ctx context.Context) ([]models.Categories, error)
 }
 
 type categoryService struct {
@@ -19,6 +20,10 @@ type categoryService struct {
 
 func NewCategoryService(repo repositories.CategoryRepository) CategoryService {
 	return &categoryService{categoryRepo: repo}
+}
+
+func (s *categoryService) GetAllCategories(ctx context.Context) ([]models.Categories, error) {
+	return s.categoryRepo.GetAllCategories(ctx)
 }
 
 func (s *categoryService) CreateCategory(ctx context.Context, req *models.CategoryRequest) (*models.Categories, error) {

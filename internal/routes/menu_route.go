@@ -22,4 +22,5 @@ func RegisterMenuRoutes(e *echo.Echo,
 
 	// Category routes
 	staffGroup.POST("/category", categoryHandler.CreateCategory)
+	staffGroup.GET("/categories", categoryHandler.GetAllCategories)
 }
