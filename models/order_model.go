@@ -10,7 +10,7 @@ type Order struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 
-	Customer Customer `gorm:"foreignKey:CustomerID"`
+	User User `gorm:"foreignKey:UserID"`
 }
 
 type OrderItem struct {
@@ -22,6 +22,6 @@ type OrderItem struct {
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 
-	Order    Order    `gorm:"foreignKey:OrderID"`
-	MenuItem MenuItem `gorm:"foreignKey:MenuItemID"`
+	Order Order `gorm:"foreignKey:OrderID"`
+	Menu  Menu  `gorm:"foreignKey:MenuID"`
 }

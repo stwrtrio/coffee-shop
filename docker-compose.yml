@@ -37,6 +37,8 @@ services:
       - zookeeper
     networks:
       - kafka-network
+    volumes:
+      - kafka_data:/var/lib/kafka/data
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
@@ -57,12 +59,16 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: coffee_shop
+    volumes:
+      - mysql_data:/var/lib/mysql
 
   redis:
     image: redis:alpine
     container_name: redis
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
 
   mailhog:
     image: mailhog/mailhog
@@ -70,3 +76,13 @@ services:
     ports:
       - "1025:1025" # SMTP server
       - "8025:8025" # Web UI
+    volumes:
+      - mailhog_data:/mailhog_data
+
+
+volumes:
+  mysql_data:
+  redis_data:
+  kafka_data:
+  mailhog_data:
+    driver: local

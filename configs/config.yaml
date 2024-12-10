@@ -33,3 +33,7 @@ email:
 jwt:
   secret_key: "your_secret_key_here"
   expiry: "24h"
+
+roleAllowed:
+  - "staff"
+  - "admin"

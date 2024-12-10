@@ -1,8 +1,6 @@
-package jwt
+package helpers
 
 import (
-	"log"
-	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -13,26 +11,18 @@ import (
 type Claims struct {
 	UserID string `json:"user_id"`
 	Email  string `json:"email"`
+	Role   string `json:"role"`
 	JTI    string `json:"jti"`
 	jwt.RegisteredClaims
 }
 
-// LoadJWTExpiry load JWT_EXPIRY in .env
-func LoadJWTExpiry() time.Duration {
-	expiryStr := os.Getenv("JWT_EXPIRY")
-	expiry, err := time.ParseDuration(expiryStr)
-	if err != nil {
-		log.Fatalf("Invalid JWT_EXPIRY in .env: %v", err)
-	}
-	return expiry
-}
-
 // GenerateJWTToken creates a JWT token for the user
-func GenerateJWTToken(config *utils.Config, userID, email string) (string, error) {
-	expirationTime := time.Now().Add(config.Jwt.Expiry)
+func GenerateJWTToken(config *utils.JwtConfig, userID, email, role string) (string, error) {
+	expirationTime := time.Now().Add(config.Expiry)
 	claims := Claims{
 		UserID: userID,
 		Email:  email,
+		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -41,13 +31,13 @@ func GenerateJWTToken(config *utils.Config, userID, email string) (string, error
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(config.Jwt.SecretKey))
+	return token.SignedString([]byte(config.SecretKey))
 }
 
 // ValidateJWTToken parses and validates a JWT token
-func ValidateJWTToken(config *utils.Config, tokenString string) (*Claims, error) {
+func ValidateJWTToken(config *utils.JwtConfig, tokenString string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(config.Jwt.SecretKey), nil
+		return []byte(config.SecretKey), nil
 	})
 	if err != nil {
 		return nil, err

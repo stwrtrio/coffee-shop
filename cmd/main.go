@@ -51,13 +51,17 @@ func main() {
 	defer redisClient.Close()
 
 	// Repository
-	customerRepo := repositories.NewCustomerRepository(db)
+	customerRepo := repositories.NewUserRepository(db)
 	emailConfirmationRepo := repositories.NewEmailConfirmationRepository(db)
 	notificationRepo := repositories.NewNotificationRepository(db)
+	menuRepo := repositories.NewMenuRepository(db)
+	categoryRepo := repositories.NewCategoryRepository(db)
 
 	// Services
-	customerService := services.NewCustomerService(config, customerRepo, kafkaClient)
+	customerService := services.NewUserService(config, customerRepo, kafkaClient)
 	emailConfirmationService := services.NewEmailConfirmationRepository(config, kafkaClient, emailConfirmationRepo)
+	menuService := services.NewMenuService(menuRepo)
+	categoryService := services.NewCategoryService(categoryRepo)
 
 	// Start Kafka Consumer
 	go emailConfirmationService.ConsumeEmailConfirmation()
@@ -75,14 +79,19 @@ func main() {
 	go notificationScheduler.StartScheduler()
 
 	// Handler
-	customerHandler := handlers.NewCustomerHandler(customerService)
+	customerHandler := handlers.NewUserHandler(customerService)
+	menuHandler := handlers.NewMenuHandler(menuService)
+	categoryHandler := handlers.NewCategoryHandler(categoryService)
 
 	// Set up Echo
 	e := echo.New()
 	e.Validator = &middlewares.CustomValidator{Validator: validator.New()}
 
 	// Customer Routes
-	routes.CustomerRoutes(e, customerHandler)
+	routes.RegisterUserRoutes(e, customerHandler)
+
+	// Menu Routes
+	routes.RegisterMenuRoutes(e, config, menuHandler, categoryHandler)
 
 	// Start the server
 	e.Logger.Fatal(e.Start(":8080"))

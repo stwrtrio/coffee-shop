@@ -10,11 +10,12 @@ import (
 
 // Config is the structure that holds the application configuration.
 type Config struct {
-	Database DatabaseConfig `yaml:"database"`
-	Kafka    KafkaConfig    `yaml:"kafka"`
-	Redis    RedisConfig    `yaml:"redis"`
-	Email    EmailConfig    `yaml:"email"`
-	Jwt      JwtConfig      `yaml:"jwt"`
+	Database     DatabaseConfig `yaml:"database"`
+	Kafka        KafkaConfig    `yaml:"kafka"`
+	Redis        RedisConfig    `yaml:"redis"`
+	Email        EmailConfig    `yaml:"email"`
+	Jwt          JwtConfig      `yaml:"jwt"`
+	RolesAllowed []string       `yaml:"roleAllowed"`
 }
 
 type JwtConfig struct {

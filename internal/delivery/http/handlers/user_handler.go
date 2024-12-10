@@ -11,44 +11,44 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type CustomerHandler struct {
-	CustomerService services.CustomerService
+type UserHandler struct {
+	UserService services.UserService
 }
 
-func NewCustomerHandler(service services.CustomerService) *CustomerHandler {
-	return &CustomerHandler{service}
+func NewUserHandler(service services.UserService) *UserHandler {
+	return &UserHandler{service}
 }
 
-// Register a new customer
-func (h *CustomerHandler) RegisterCustomer(c echo.Context) error {
+// Register a new user
+func (h *UserHandler) RegisterUser(c echo.Context) error {
 	ctx := c.Request().Context()
 	var req *models.RegisterRequest
 	if err := c.Bind(&req); err != nil {
 		return utils.FailResponse(c, http.StatusBadRequest, "Invalid request body")
 	}
 
-	if err := h.CustomerService.RegisterCustomer(ctx, req); err != nil {
-		return utils.FailResponse(c, http.StatusInternalServerError, "Failed to create customer")
+	if err := h.UserService.RegisterUser(ctx, req); err != nil {
+		return utils.FailResponse(c, http.StatusInternalServerError, "Failed to create user")
 	}
 
-	return utils.SuccessResponse(c, http.StatusCreated, "customer registered successfully", nil)
+	return utils.SuccessResponse(c, http.StatusCreated, "user registered successfully", nil)
 }
 
-// Login handles customer login
-func (h *CustomerHandler) LoginCustomer(c echo.Context) error {
+// Login handles user login
+func (h *UserHandler) LoginUser(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	// Parse request body
-	var customerRequest models.LoginRequest
-	if err := c.Bind(&customerRequest); err != nil {
+	var userRequest models.LoginRequest
+	if err := c.Bind(&userRequest); err != nil {
 		return utils.FailResponse(c, http.StatusBadRequest, "Invalid request body")
 	}
 
 	// Call the service to validate credentials and generate token
-	token, err := h.CustomerService.LoginCustomer(ctx, &customerRequest)
+	token, err := h.UserService.LoginUser(ctx, &userRequest)
 	if err != nil {
-		if err.Error() == "customer is not confirmed" {
-			return utils.FailResponse(c, http.StatusUnauthorized, "Customer email has not been confirmed.")
+		if err.Error() == "user is not confirmed" {
+			return utils.FailResponse(c, http.StatusUnauthorized, "User email has not been confirmed.")
 		}
 		return utils.FailResponse(c, http.StatusUnauthorized, "invalid credentials")
 	}
@@ -56,8 +56,8 @@ func (h *CustomerHandler) LoginCustomer(c echo.Context) error {
 	return utils.SuccessResponse(c, http.StatusOK, "Access granted", map[string]string{"token": token})
 }
 
-// ConfirmCode verifies the customer's confirmation code
-func (h *CustomerHandler) ConfirmCode(c echo.Context) error {
+// ConfirmCode verifies the user's confirmation code
+func (h *UserHandler) ConfirmCode(c echo.Context) error {
 	ctx := c.Request().Context()
 	var req models.ConfirmCodeRequest
 	if err := c.Bind(&req); err != nil {
@@ -68,10 +68,10 @@ func (h *CustomerHandler) ConfirmCode(c echo.Context) error {
 		return utils.FailResponse(c, http.StatusBadRequest, "Invalid request body")
 	}
 
-	err := h.CustomerService.ConfirmCode(ctx, req.Email, req.Code)
+	err := h.UserService.ConfirmCode(ctx, req.Email, req.Code)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return utils.FailResponse(c, http.StatusBadRequest, "customer not found")
+			return utils.FailResponse(c, http.StatusBadRequest, "user not found")
 		}
 		if err.Error() == "invalid confirmation code" || err.Error() == "confirmation code expired" {
 			return utils.FailResponse(c, http.StatusBadRequest, err.Error())

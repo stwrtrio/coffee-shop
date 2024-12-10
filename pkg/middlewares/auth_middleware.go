@@ -1,43 +1,54 @@
 package middlewares
 
 import (
+	"errors"
 	"net/http"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
+	"github.com/stwrtrio/coffee-shop/pkg/helpers"
+	"github.com/stwrtrio/coffee-shop/pkg/utils"
 )
 
-func JWTMiddleware(secretKey string) echo.MiddlewareFunc {
+func JWTMiddleware(config utils.JwtConfig) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			authHeader := c.Request().Header.Get("Authorization")
 			if authHeader == "" {
-				return echo.NewHTTPError(http.StatusUnauthorized, "Missing Authorization header")
+				return utils.FailResponse(c, http.StatusUnauthorized, "Missing Authorization header")
 			}
 
 			tokenString := authHeader[len("Bearer "):]
-			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-				return []byte(secretKey), nil
-			})
 
-			if err != nil || !token.Valid {
-				return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
+			// Validate the token
+			claims, err := helpers.ValidateJWTToken(&config, tokenString)
+			if err != nil {
+				return errors.New("invalid or expired token")
 			}
 
-			c.Set("user", token.Claims)
+			c.Set("user", claims)
+			c.Set("user_role", claims.Role)
 			return next(c)
 		}
 	}
 }
 
-func RoleMiddleware(role string) echo.MiddlewareFunc {
+func RoleMiddleware(allowedRoles ...string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			user := c.Get("user").(jwt.MapClaims)
-			if user["role"] != role {
-				return echo.NewHTTPError(http.StatusForbidden, "Forbidden")
+			// Retrieve the user's role from the context (assumes JWT middleware sets this)
+			role := c.Get("user_role")
+			if role == nil {
+				return utils.FailResponse(c, http.StatusUnauthorized, "Unauthorized")
 			}
-			return next(c)
+
+			// Check if the role is allowed
+			for _, allowedRole := range allowedRoles {
+				if role == allowedRole {
+					return next(c)
+				}
+			}
+
+			return utils.FailResponse(c, http.StatusForbidden, "Access Forbiden")
 		}
 	}
 }
