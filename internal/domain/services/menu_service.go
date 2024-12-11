@@ -84,8 +84,10 @@ func (s *menuService) GetAllMenus(ctx context.Context, page, limit int, useCache
 
 	if useCache == "true" || useCache == "1" {
 		menus, err := s.GetMenusFromCache(ctx, page, limit)
-		if err == nil {
+		if len(menus) > 0 {
 			return menus, nil
+		} else if err != nil {
+			return menus, err
 		}
 	}
 

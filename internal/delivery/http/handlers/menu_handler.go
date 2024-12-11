@@ -62,5 +62,5 @@ func (h *MenuHandler) GetAllMenus(c echo.Context) error {
 		return utils.FailResponse(c, http.StatusInternalServerError, "Failed to fetch menus")
 	}
 
-	return utils.SuccessResponse(c, http.StatusCreated, "", menus)
+	return utils.SuccessResponse(c, http.StatusOK, "", menus)
 }
