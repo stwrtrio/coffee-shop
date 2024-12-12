@@ -23,6 +23,7 @@ type MenuService interface {
 	GetAllMenus(ctx context.Context, page, limit int, useCache string) ([]models.Menu, error)
 	GetMenuByID(ctx context.Context, menuID string) (*models.Menu, error)
 	GetMenusFromCache(ctx context.Context, page, limit int) ([]models.Menu, error)
+	DeleteMenu(ctx context.Context, menuID string) error
 }
 
 type menuService struct {
@@ -161,4 +162,8 @@ func (s *menuService) UpdateMenu(ctx context.Context, req *models.MenuRequest) (
 	}
 
 	return menu, nil
+}
+
+func (s *menuService) DeleteMenu(ctx context.Context, menuID string) error {
+	return s.menuRepo.DeleteMenu(ctx, menuID)
 }

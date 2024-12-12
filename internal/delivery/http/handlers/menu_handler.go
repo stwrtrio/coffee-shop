@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -86,4 +87,15 @@ func (h *MenuHandler) UpdateMenu(c echo.Context) error {
 	}
 
 	return utils.SuccessResponse(c, http.StatusOK, "", menu)
+}
+
+func (h *MenuHandler) DeleteMenu(c echo.Context) error {
+	menuID := c.Param("id")
+
+	if err := h.service.DeleteMenu(c.Request().Context(), menuID); err != nil {
+		log.Fatalf("error: %v", err)
+		return utils.FailResponse(c, http.StatusInternalServerError, "Failed to delete menu")
+	}
+
+	return utils.SuccessResponse(c, http.StatusOK, "Success delete menu", nil)
 }

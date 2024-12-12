@@ -17,6 +17,7 @@ type MenuRepository interface {
 	GetAllMenus(ctx context.Context, offset, limit int) ([]models.Menu, error)
 	GetMenuByID(ctx context.Context, menuID string) (*models.Menu, error)
 	FindMenuByName(ctx context.Context, menuName string) (*models.Menu, error)
+	DeleteMenu(ctx context.Context, menuID string) error
 }
 
 func NewMenuRepository(db *gorm.DB) MenuRepository {
@@ -54,4 +55,8 @@ func (r *menuRepository) GetMenuByID(ctx context.Context, menuID string) (*model
 
 func (r *menuRepository) UpdateMenu(ctx context.Context, req *models.Menu) error {
 	return r.db.WithContext(ctx).Updates(req).Where("id = ?", req.ID).Error
+}
+
+func (r *menuRepository) DeleteMenu(ctx context.Context, menuID string) error {
+	return r.db.WithContext(ctx).Model(&models.Menu{}).Where("id = ?", menuID).Update("is_deleted", true).Error
 }

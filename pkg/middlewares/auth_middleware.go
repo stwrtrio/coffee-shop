@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -27,7 +26,7 @@ func JWTMiddleware(config utils.JwtConfig) echo.MiddlewareFunc {
 			// Validate the token
 			claims, err := helpers.ValidateJWTToken(&config, tokenString)
 			if err != nil {
-				return errors.New("invalid or expired token")
+				return utils.FailResponse(c, http.StatusUnauthorized, "invalid or expired token")
 			}
 
 			c.Set("user", claims)
