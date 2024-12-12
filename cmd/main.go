@@ -88,7 +88,7 @@ func main() {
 	e.Validator = &middlewares.CustomValidator{Validator: validator.New()}
 
 	// Customer Routes
-	routes.RegisterUserRoutes(e, customerHandler)
+	routes.RegisterUserRoutes(e, config, customerHandler)
 
 	// Menu Routes
 	routes.RegisterMenuRoutes(e, config, menuHandler, categoryHandler)
