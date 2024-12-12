@@ -17,7 +17,7 @@ type User struct {
 	UpdatedAt               time.Time
 }
 
-type RegisterRequest struct {
+type UserRegisterRequest struct {
 	Name     string `json:"name" validate:"required,max=200"`
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=6"`
@@ -25,12 +25,20 @@ type RegisterRequest struct {
 	Address  string `json:"address"`
 }
 
-type LoginRequest struct {
+type UserUpdateRequest struct {
+	Name    string `json:"name"`
+	Phone   string `json:"phone"`
+	Address string `json:"address"`
+
+	UserID string
+}
+
+type UserLoginRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 }
 
-type ConfirmCodeRequest struct {
+type UserConfirmCodeRequest struct {
 	Email string `json:"email" validate:"required,email"`
 	Code  string `json:"code" validate:"required"`
 }

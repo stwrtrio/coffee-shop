@@ -11,4 +11,5 @@ func RegisterUserRoutes(e *echo.Echo, customerHandler *handlers.UserHandler) {
 	e.POST("/api/user/register", customerHandler.RegisterUser)
 	e.POST("/api/user/login", customerHandler.LoginUser)
 	e.POST("/api/user/confirm-code", customerHandler.ConfirmCode)
+	e.PUT("/api/user/update/:id", customerHandler.UpdateUser)
 }

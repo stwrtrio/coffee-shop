@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -153,8 +154,9 @@ func (s *menuService) UpdateMenu(ctx context.Context, req *models.MenuRequest) (
 	menu.UpdatedBy = req.UpdatedBy
 	menu.UpdatedAt = time.Now()
 
-	err = s.menuRepo.UpdateMenu(menu)
+	err = s.menuRepo.UpdateMenu(ctx, menu)
 	if err != nil {
+		log.Printf("Failed to update menu: %v", err)
 		return menu, err
 	}
 

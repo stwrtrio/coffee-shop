@@ -19,9 +19,10 @@ import (
 )
 
 type UserService interface {
-	RegisterUser(ctx context.Context, input *models.RegisterRequest) error
-	LoginUser(ctx context.Context, user *models.LoginRequest) (string, error)
+	RegisterUser(ctx context.Context, input *models.UserRegisterRequest) error
+	LoginUser(ctx context.Context, user *models.UserLoginRequest) (string, error)
 	ConfirmCode(ctx context.Context, email, code string) error
+	UpdateUser(ctx context.Context, req models.UserUpdateRequest) (*models.User, error)
 }
 
 type userService struct {
@@ -34,7 +35,7 @@ func NewUserService(config *utils.Config, userRepo repositories.UserRepository, 
 	return &userService{config: config, userRepo: userRepo, kafka: kafka}
 }
 
-func (s *userService) RegisterUser(ctx context.Context, req *models.RegisterRequest) error {
+func (s *userService) RegisterUser(ctx context.Context, req *models.UserRegisterRequest) error {
 	// Check if the email is already in use
 	existingUser, err := s.userRepo.FindUserByEmail(ctx, req.Email)
 	if err != nil {
@@ -88,7 +89,7 @@ func (s *userService) RegisterUser(ctx context.Context, req *models.RegisterRequ
 }
 
 // Login checks if the user credentials are correct and generates a JWT token
-func (s *userService) LoginUser(ctx context.Context, user *models.LoginRequest) (string, error) {
+func (s *userService) LoginUser(ctx context.Context, user *models.UserLoginRequest) (string, error) {
 	// Fetch user from repository
 	userResult, err := s.userRepo.FindUserByEmail(ctx, user.Email)
 	if err != nil {
@@ -136,10 +137,35 @@ func (s *userService) ConfirmCode(ctx context.Context, email, code string) error
 	user.EmailConfirmationCode = "" // Clear the confirmation code
 
 	// Save the updated user data
-	err = s.userRepo.Update(user)
+	err = s.userRepo.UpdateUser(ctx, user)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (s *userService) UpdateUser(ctx context.Context, req models.UserUpdateRequest) (*models.User, error) {
+	var user *models.User
+
+	user, err := s.userRepo.FindUserByID(ctx, req.UserID)
+	if err != nil {
+		log.Printf("Failed to update find user by id: %v", err)
+		return user, err
+	}
+
+	if user == nil {
+		return user, errors.New("user not found")
+	}
+
+	user.Name = req.Name
+	user.Address = req.Address
+	user.Phone = req.Phone
+
+	if err = s.userRepo.UpdateUser(ctx, user); err != nil {
+		log.Printf("Failed to update user: %v", err)
+		return nil, err
+	}
+
+	return user, nil
 }

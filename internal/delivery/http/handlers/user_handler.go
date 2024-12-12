@@ -22,7 +22,7 @@ func NewUserHandler(service services.UserService) *UserHandler {
 // Register a new user
 func (h *UserHandler) RegisterUser(c echo.Context) error {
 	ctx := c.Request().Context()
-	var req *models.RegisterRequest
+	var req *models.UserRegisterRequest
 	if err := c.Bind(&req); err != nil {
 		return utils.FailResponse(c, http.StatusBadRequest, "Invalid request body")
 	}
@@ -39,7 +39,7 @@ func (h *UserHandler) LoginUser(c echo.Context) error {
 	ctx := c.Request().Context()
 
 	// Parse request body
-	var userRequest models.LoginRequest
+	var userRequest models.UserLoginRequest
 	if err := c.Bind(&userRequest); err != nil {
 		return utils.FailResponse(c, http.StatusBadRequest, "Invalid request body")
 	}
@@ -59,7 +59,7 @@ func (h *UserHandler) LoginUser(c echo.Context) error {
 // ConfirmCode verifies the user's confirmation code
 func (h *UserHandler) ConfirmCode(c echo.Context) error {
 	ctx := c.Request().Context()
-	var req models.ConfirmCodeRequest
+	var req models.UserConfirmCodeRequest
 	if err := c.Bind(&req); err != nil {
 		return utils.FailResponse(c, http.StatusBadRequest, "Invalid request body")
 	}
@@ -80,4 +80,22 @@ func (h *UserHandler) ConfirmCode(c echo.Context) error {
 	}
 
 	return utils.SuccessResponse(c, http.StatusOK, "Email confirmed successfully", nil)
+}
+
+func (h *UserHandler) UpdateUser(c echo.Context) error {
+	ctx := c.Request().Context()
+
+	var req models.UserUpdateRequest
+	if err := c.Bind(&req); err != nil {
+		return utils.FailResponse(c, http.StatusBadRequest, "Invalid request body")
+	}
+
+	req.UserID = c.Param("id")
+
+	user, err := h.UserService.UpdateUser(ctx, req)
+	if err != nil {
+		return utils.FailResponse(c, http.StatusInternalServerError, "Update User Failed")
+	}
+
+	return utils.SuccessResponse(c, http.StatusOK, "", user)
 }

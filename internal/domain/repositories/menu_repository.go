@@ -13,7 +13,7 @@ type menuRepository struct {
 
 type MenuRepository interface {
 	CreateMenu(menu *models.Menu) error
-	UpdateMenu(req *models.Menu) error
+	UpdateMenu(ctx context.Context, req *models.Menu) error
 	GetAllMenus(ctx context.Context, offset, limit int) ([]models.Menu, error)
 	GetMenuByID(ctx context.Context, menuID string) (*models.Menu, error)
 	FindMenuByName(ctx context.Context, menuName string) (*models.Menu, error)
@@ -52,6 +52,6 @@ func (r *menuRepository) GetMenuByID(ctx context.Context, menuID string) (*model
 	return &menu, nil
 }
 
-func (r *menuRepository) UpdateMenu(req *models.Menu) error {
-	return r.db.Updates(req).Where("id = ?", req.ID).Error
+func (r *menuRepository) UpdateMenu(ctx context.Context, req *models.Menu) error {
+	return r.db.WithContext(ctx).Updates(req).Where("id = ?", req.ID).Error
 }
