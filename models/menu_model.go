@@ -31,5 +31,7 @@ type MenuRequest struct {
 	PreparationTime int     `json:"preparation_time"`
 	Calories        int     `json:"calories"`
 
+	MenuID    string
 	CreatedBy string
+	UpdatedBy string
 }

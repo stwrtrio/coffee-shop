@@ -64,3 +64,26 @@ func (h *MenuHandler) GetAllMenus(c echo.Context) error {
 
 	return utils.SuccessResponse(c, http.StatusOK, "", menus)
 }
+
+func (h *MenuHandler) UpdateMenu(c echo.Context) error {
+	var req *models.MenuRequest
+	if err := c.Bind(&req); err != nil {
+		return utils.FailResponse(c, http.StatusBadRequest, constants.ErrInvalidRequestBody)
+	}
+
+	req.MenuID = c.Param("id")
+
+	claims, ok := middlewares.GetUserFromContext(c)
+	if !ok {
+		return utils.FailResponse(c, http.StatusBadRequest, constants.ErrInvalidToken)
+	}
+
+	req.UpdatedBy = claims.UserID
+
+	menu, err := h.service.UpdateMenu(c.Request().Context(), req)
+	if err != nil {
+		return utils.FailResponse(c, http.StatusInternalServerError, "Failed to update menu")
+	}
+
+	return utils.SuccessResponse(c, http.StatusOK, "", menu)
+}

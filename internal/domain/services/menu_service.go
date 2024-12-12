@@ -18,7 +18,9 @@ import (
 
 type MenuService interface {
 	CreateMenu(ctx context.Context, req *models.MenuRequest) (*models.Menu, error)
+	UpdateMenu(ctx context.Context, req *models.MenuRequest) (*models.Menu, error)
 	GetAllMenus(ctx context.Context, page, limit int, useCache string) ([]models.Menu, error)
+	GetMenuByID(ctx context.Context, menuID string) (*models.Menu, error)
 	GetMenusFromCache(ctx context.Context, page, limit int) ([]models.Menu, error)
 }
 
@@ -124,4 +126,37 @@ func (s *menuService) GetMenusFromCache(ctx context.Context, page, limit int) ([
 	}
 
 	return cacheMenus, nil
+}
+
+// GetMenuByID
+func (s *menuService) GetMenuByID(ctx context.Context, menuID string) (*models.Menu, error) {
+	return s.menuRepo.GetMenuByID(ctx, menuID)
+}
+
+func (s *menuService) UpdateMenu(ctx context.Context, req *models.MenuRequest) (*models.Menu, error) {
+	var menu *models.Menu
+
+	menu, err := s.menuRepo.GetMenuByID(ctx, req.MenuID)
+	if err != nil {
+		return menu, err
+	}
+
+	menu.Name = req.Name
+	menu.Description = req.Description
+	menu.Price = req.Price
+	menu.CategoryID = req.CategoryID
+	menu.Availability = req.Availability
+	menu.ImageURL = req.ImageURL
+	menu.Ingredients = req.Ingredients
+	menu.PreparationTime = req.PreparationTime
+	menu.Calories = req.Calories
+	menu.UpdatedBy = req.UpdatedBy
+	menu.UpdatedAt = time.Now()
+
+	err = s.menuRepo.UpdateMenu(menu)
+	if err != nil {
+		return menu, err
+	}
+
+	return menu, nil
 }

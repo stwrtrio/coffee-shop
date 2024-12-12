@@ -13,7 +13,9 @@ type menuRepository struct {
 
 type MenuRepository interface {
 	CreateMenu(menu *models.Menu) error
+	UpdateMenu(req *models.Menu) error
 	GetAllMenus(ctx context.Context, offset, limit int) ([]models.Menu, error)
+	GetMenuByID(ctx context.Context, menuID string) (*models.Menu, error)
 	FindMenuByName(ctx context.Context, menuName string) (*models.Menu, error)
 }
 
@@ -38,4 +40,18 @@ func (r *menuRepository) FindMenuByName(ctx context.Context, menuName string) (*
 		return nil, nil
 	}
 	return &menu, err
+}
+
+func (r *menuRepository) GetMenuByID(ctx context.Context, menuID string) (*models.Menu, error) {
+	var menu models.Menu
+	err := r.db.WithContext(ctx).Where("id = ?", menuID).First(&menu).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+
+	return &menu, nil
+}
+
+func (r *menuRepository) UpdateMenu(req *models.Menu) error {
+	return r.db.Updates(req).Where("id = ?", req.ID).Error
 }
