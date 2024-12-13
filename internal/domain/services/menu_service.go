@@ -76,7 +76,7 @@ func (s *menuService) CreateMenu(ctx context.Context, req *models.MenuRequest) (
 		CreatedBy:       req.CreatedBy,
 	}
 
-	if err = s.menuRepo.CreateMenu(menu); err != nil {
+	if err = s.menuRepo.CreateMenu(ctx, menu); err != nil {
 		return nil, err
 	}
 

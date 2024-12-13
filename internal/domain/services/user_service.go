@@ -66,7 +66,7 @@ func (s *userService) RegisterUser(ctx context.Context, req *models.UserRegister
 	}
 
 	// Save the user to the database
-	if err = s.userRepo.CreateUser(user); err != nil {
+	if err = s.userRepo.CreateUser(ctx, user); err != nil {
 		return err
 	}
 

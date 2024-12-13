@@ -8,7 +8,7 @@ import (
 )
 
 type UserRepository interface {
-	CreateUser(user *models.User) error
+	CreateUser(ctx context.Context, user *models.User) error
 	FindUserByID(ctx context.Context, userID string) (*models.User, error)
 	FindUserByEmail(ctx context.Context, email string) (*models.User, error)
 	UpdateUser(ctx context.Context, user *models.User) error
@@ -22,7 +22,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	return &userRepository{db: db}
 }
 
-func (r *userRepository) CreateUser(user *models.User) error {
+func (r *userRepository) CreateUser(ctx context.Context, user *models.User) error {
 	return r.db.Create(user).Error
 }
 
