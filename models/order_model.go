@@ -3,25 +3,15 @@ package models
 import "time"
 
 type Order struct {
-	ID         string  `gorm:"type:uuid;primaryKey"`
-	CustomerID string  `gorm:"type:uuid;not null"`
-	TotalPrice float64 `gorm:"not null"`
-	Status     string  `gorm:"default:'Pending'"`
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-
-	User User `gorm:"foreignKey:UserID"`
-}
-
-type OrderItem struct {
-	ID         string  `gorm:"type:uuid;primaryKey"`
-	OrderID    string  `gorm:"type:uuid;not null"`
-	MenuItemID string  `gorm:"type:uuid;not null"`
-	Quantity   int     `gorm:"not null"`
-	UnitPrice  float64 `gorm:"not null"`
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-
-	Order Order `gorm:"foreignKey:OrderID"`
-	Menu  Menu  `gorm:"foreignKey:MenuID"`
+	ID        string    `gorm:"type:varchar(36);primaryKey"`
+	UserID    string    `gorm:"type:varchar(36);not null"`
+	MenuID    string    `gorm:"type:varchar(36);not null"`
+	Quantity  int       `gorm:"not null"`
+	Total     float64   `gorm:"not null"`
+	Status    string    `gorm:"type:enum('pending','completed','cancelled');default:'pending'"`
+	CreatedBy string    `gorm:"type:varchar(36)" json:"created_by"`
+	UpdatedBy string    `gorm:"type:varchar(36)" json:"updated_by"`
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime"`
+	IsDeleted bool      `gorm:"default:false"`
 }

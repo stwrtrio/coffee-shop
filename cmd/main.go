@@ -56,6 +56,7 @@ func main() {
 	notificationRepo := repositories.NewNotificationRepository(db)
 	menuRepo := repositories.NewMenuRepository(db)
 	categoryRepo := repositories.NewCategoryRepository(db)
+	orderRepo := repositories.NewOrderRepository(db)
 
 	// Services
 	customerService := services.NewUserService(config, customerRepo, kafkaClient)
@@ -74,8 +75,8 @@ func main() {
 		config.Email.SenderPasswd,
 	)
 
-	// Start the notification scheduler
-	notificationScheduler := scheduler.NewNotificationScheduler(notificationRepo, emailService)
+	// Start the scheduler
+	notificationScheduler := scheduler.NewScheduler(notificationRepo, orderRepo, emailService)
 	go notificationScheduler.StartScheduler()
 
 	// Handler
