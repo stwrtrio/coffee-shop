@@ -63,6 +63,7 @@ func main() {
 	emailConfirmationService := services.NewEmailConfirmationRepository(config, kafkaClient, emailConfirmationRepo)
 	menuService := services.NewMenuService(config, redisClient, menuRepo, categoryRepo)
 	categoryService := services.NewCategoryService(categoryRepo)
+	orderService := services.NewOrderService(orderRepo, menuRepo)
 
 	// Start Kafka Consumer
 	go emailConfirmationService.ConsumeEmailConfirmation()
@@ -83,6 +84,7 @@ func main() {
 	customerHandler := handlers.NewUserHandler(customerService)
 	menuHandler := handlers.NewMenuHandler(menuService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
+	orderHandler := handlers.NewOrderHandler(orderService)
 
 	// Set up Echo
 	e := echo.New()
@@ -93,6 +95,9 @@ func main() {
 
 	// Menu Routes
 	routes.RegisterMenuRoutes(e, config, menuHandler, categoryHandler)
+
+	// Order Routes
+	routes.RegisterOrderRoutes(e, config, orderHandler)
 
 	// Start the server
 	e.Logger.Fatal(e.Start(":8080"))

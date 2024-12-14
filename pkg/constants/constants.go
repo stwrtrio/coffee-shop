@@ -6,6 +6,7 @@ const (
 	// Handler Error Message
 	ErrInvalidRequestBody = "Invalid request body"
 	ErrInvalidToken       = "Invalid Token"
+	ErrorMenuIDNotFound   = "menu id not found"
 
 	// Email Error Message
 	EmailTypeConfirmation  EmailType = "confirmation"
@@ -17,6 +18,11 @@ const (
 
 	// Redis Cache Key
 	MenusCacheKey = "menus:page=%d:limit=%d"
+
+	// Order Status
+	OrderStatusPending   = "pending"
+	OrderStatusCompleted = "completed"
+	OrderStatusCancelled = "cancelled"
 )
 
 var NotificationConstants = struct {
